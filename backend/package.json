@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@types/ws": "^7.4.1",
-    "await-lock": "^2.1.0",
     "expo-server-sdk": "^3.6.0",
     "firebase-admin": "^9.6.0",
     "ws": "^7.4.5"
