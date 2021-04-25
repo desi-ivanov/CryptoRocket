@@ -31,6 +31,7 @@ async function userNotificationToken(uid: string) {
   }
   const toks = await UsersCollection.doc(uid).get().then(v => v.data()?.notificationTokens ?? []);
   memo[uid] = toks;
+  UsersCollection.doc(uid).onSnapshot(snap => memo[uid] = snap.data()?.notificationTokens ?? []);
   return toks;
 }
 
@@ -41,7 +42,7 @@ async function Subscribe(data: PriceAlert, docRef: FirebaseFirestore.DocumentRef
         || currentPrice > data.priceTop
       ) {
         console.log("Notifying", currentPrice, data)
-        
+
         const prevPrice = (data.priceTop + data.priceBottom) / 2;
         data.priceTop = currentPrice * (1 + data.percentage);
         data.priceBottom = currentPrice * (1 - data.percentage);

@@ -66,7 +66,7 @@ export function Pairs(props: {
       ListEmptyComponent={props.isValidating ? <></> : <Text>No pairs found 🤷‍♂️</Text>}
       renderItem={({ item }) => (
         <TouchableOpacity onPress={() => handleSymbolPressed(item)} style={{ flexDirection: "row", paddingVertical: 10 }}>
-          <CryptoAssetImage asset={exInfo.map[item.symbol].baseAsset.toLowerCase()} />
+          <CryptoAssetImage asset={exInfo.map[item.symbol]?.baseAsset?.toLowerCase()} />
           <View style={{ flex: 1, paddingVertical: 5, paddingLeft: 8 }}>
             <Text style={{ fontWeight: "600" }}>{item.symbol}</Text>
             <Text style={{ color: Colors.gray }}>{parseFloat(item.priceChangePercent) >= 0 ? "+" : ""}{item.priceChangePercent}%</Text>
