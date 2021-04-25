@@ -52,7 +52,7 @@ async function Subscribe(data: PriceAlert, docRef: FirebaseFirestore.DocumentRef
           await expo.sendPushNotificationsAsync([{
             to: notifTokens
             , title: data.symbol
-            , body: `${currentPrice > prevPrice ? "🟢" : "🔵"} ${prevPrice} → ${currentPrice} ${currentPrice > prevPrice ? "📈" : "📉"} ${((currentPrice / prevPrice - 1) * 100).toFixed(2)}%`
+            , body: `${currentPrice > prevPrice ? "🟢" : "🔵"} ${prevPrice.toFixed(2)} → ${currentPrice.toFixed(2)} ${currentPrice > prevPrice ? "📈" : "📉"} ${((currentPrice / prevPrice - 1) * 100).toFixed(2)}%`
           }]);
           console.log("Sending", notifTokens)
         }
