@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react"
 import { View, ActivityIndicator } from "react-native"
+import LottieView from 'lottie-react-native';
 
 export type LoadingContextType = {
 	push: () => void,
@@ -24,7 +25,7 @@ export const useLoading: () => (<T> (f: () => Promise<T>) => Promise<T>) = () =>
 	}
 }
 
-export const LoadingAbsoluteView = ({visible}: {visible: boolean}) => {
+export const LoadingAbsoluteView = ({ visible }: { visible: boolean }) => {
 	if(!visible) return null
 	return <View
 		style={{
@@ -38,7 +39,8 @@ export const LoadingAbsoluteView = ({visible}: {visible: boolean}) => {
 			justifyContent: "center",
 			backgroundColor: "#88888888"
 		}}>
-		<ActivityIndicator size="large" color="#000" />
+		<LottieView autoPlay style={{ width: 100, height: 100, }} source={require("../../assets/lottie-bitcoin.json")}
+		/>
 	</View>
 }
 
