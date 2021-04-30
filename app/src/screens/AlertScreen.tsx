@@ -17,7 +17,7 @@ export default function AlertScreen(props: StackScreenProps<RootStackParams, "Al
     if(isNaN(parseFloat(percentageRef.current))) {
       Alert.alert("Invalid input");
     } else {
-      loading(() => ctx.addAlert(props.route.params.symbol, parseFloat(percentageRef.current) / 100))
+      loading(() => ctx.addAlert(props.route.params.symbol, parseFloat(percentageRef.current.replace(",", ".")) / 100))
         .then(() => {
           Alert.alert("Success");
           props.navigation.pop();
@@ -34,7 +34,7 @@ export default function AlertScreen(props: StackScreenProps<RootStackParams, "Al
         <Input
           placeholder={`Percentage eg. 1.00%`}
           onChangeText={(txt) => percentageRef.current = txt}
-          textInputProps={{ keyboardType: "decimal-pad", defaultValue: "1.00" }}
+          textInputProps={{ keyboardType: "numbers-and-punctuation", defaultValue: "1.00" }}
         />
         <Button style={{ marginTop: 20 }} onPress={handleSubmit}>Create alert</Button>
       </View>
