@@ -12,7 +12,7 @@ import { CryptoAssetImage } from "./TrendingScreen";
 
 const FullWidth = Dimensions.get("screen").width;
 
-const CardWidth = FullWidth - 20 * 2;
+const CardWidth = Math.min(FullWidth, 500) - 20 * 2;
 const CardHeight = CardWidth / 1.8
 
 export default function WalletScreen(props: StackScreenProps<RootStackParams, "Tabs">) {
@@ -60,6 +60,7 @@ function Holdings(props: {
         , width: CardWidth
         , height: CardHeight
         , marginBottom: 20
+        , alignSelf: "center"
       }}>
         <Image source={Assets.Card} style={{ position: "absolute", height: "100%", width: "100%" }} resizeMode="cover" />
         <View style={{ padding: 28 }}>
