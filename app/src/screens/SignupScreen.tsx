@@ -25,7 +25,6 @@ export default function SignupScreen(props: StackScreenProps<RootStackParams, "L
   function handleCreatePressed() {
     loading(() => auth.signup(inputRef.current.name, inputRef.current.email, inputRef.current.password))
       .then(() => {
-        Alert.alert("Success");
         props.navigation.goBack()
       }).catch(AlertError)
   }

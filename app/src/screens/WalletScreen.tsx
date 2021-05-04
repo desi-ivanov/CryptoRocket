@@ -7,7 +7,8 @@ import Header from "../components/Header"
 import Assets from "../constants/Assets"
 import Colors from "../constants/Colors";
 import { useAuth } from "../context/AuthContext";
-import { CryptoAssetImage, use24HrTicker } from "./TrendingScreen";
+import { use24HrTicker } from "../hooks/use24HrTicker";
+import { CryptoAssetImage } from "./TrendingScreen";
 
 const FullWidth = Dimensions.get("screen").width;
 

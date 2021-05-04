@@ -23,7 +23,6 @@ export default function LoginScreen(props: StackScreenProps<RootStackParams, "Lo
   function handleLoginPressed() {
     loading(() => auth.login(inputRef.current.email, inputRef.current.password))
       .then(() => {
-        Alert.alert("Success");
         props.navigation.popToTop();
       }).catch(AlertError)
   }

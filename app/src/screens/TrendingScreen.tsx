@@ -1,30 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, SafeAreaView, TextInput, FlatList, RefreshControl, TouchableOpacity, Image } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, Image } from 'react-native'
 import Colors from "../constants/Colors";
-import useSWR from 'swr'
 import SearchBar from "../components/SearchBar";
 import Header from "../components/Header";
 import { StackScreenProps } from "@react-navigation/stack";
+import { useExchangeInfo } from "../hooks/useExchangeInfo";
+import { use24HrTicker } from "../hooks/use24HrTicker";
+import { CryptoAssetImageUri } from "../util/CryptoAssetImageUri";
 
-function CryptoAssetImageUri(asset: string) {
-  return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32@2x/color/${asset}@2x.png`;
-}
-
-export function useExchangeInfo() {
-  const exchangeInfo = useSWR<ExchangeInfo>("https://api.binance.com/api/v3/exchangeInfo");
-  return {
-    ...exchangeInfo
-    , map: Object.fromEntries((exchangeInfo.data?.symbols ?? []).map(x => [x.symbol, x]))
-  }
-}
-
-export function use24HrTicker() {
-  const tick = useSWR<PriceTicker[]>("https://api.binance.com/api/v3/ticker/24hr");
-  return {
-    ...tick
-    , map: Object.fromEntries((tick.data ?? []).map(v => ([v.symbol, v])))
-  }
-}
 
 export default function TrendingScreen(props: StackScreenProps<RootStackParams, "Tabs">) {
   const res = use24HrTicker();

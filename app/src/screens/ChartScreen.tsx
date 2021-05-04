@@ -8,11 +8,12 @@ import WebView from "react-native-webview"
 import useSWR from "swr"
 import Button from "../components/Button"
 import StackHeader from "../components/StackHeader"
-import { useProtected } from "../context/useProtected"
+import { useProtected } from "../hooks/useProtected"
 import { useAuth } from "../context/AuthContext"
 import { AlertError } from "../util/util"
 import { useLoading } from "../context/LoadingContext"
-import { useExchangeInfo } from "./TrendingScreen"
+import { useExchangeInfo } from "../hooks/useExchangeInfo"
+import { CryptoAssetImage } from "./TrendingScreen"
 
 
 export default function ChartScreen(props: StackScreenProps<RootStackParams, "Chart">) {
@@ -61,25 +62,48 @@ export default function ChartScreen(props: StackScreenProps<RootStackParams, "Ch
         <Text style={{ fontSize: 20, fontWeight: "500" }}>Price</Text>
         <Price symbol={props.route.params.symbol} />
         <Chart symbol={props.route.params.symbol} />
+        <Holdings symbol={props.route.params.symbol} />
       </ScrollView>
       <SafeAreaView>
-        <View>
-
-          <View style={{ paddingHorizontal: 20, flexDirection: "row" }}>
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-              <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
-            </View>
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-              <Button onPress={handleBuyPressed} style={{ paddingHorizontal: 40 }}>BUY</Button>
-            </View>
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-              <Button onPress={handleSellPressed} style={{ paddingHorizontal: 40 }}>SELL</Button>
-            </View>
+        <View style={{ paddingHorizontal: 20, flexDirection: "row", marginBottom: 10 }}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <Button textStyle={{ fontSize: 13 }} onPress={handleBuyPressed} style={{ paddingHorizontal: 30 }}>BUY</Button>
+          </View>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <Button textStyle={{ fontSize: 13 }} onPress={handleSellPressed} style={{ paddingHorizontal: 30 }}>SELL</Button>
           </View>
         </View>
       </SafeAreaView>
     </View>
   )
+}
+
+function Holdings(props: {
+  symbol: string
+}) {
+  const ctx = useAuth();
+  const exInfo = useExchangeInfo();
+  const trade = exInfo.map[props.symbol];
+  return ctx.user
+    .map(u => (
+      <View>
+        <Text style={{ fontSize: 20, fontWeight: "500" }}>Available</Text>
+        {([
+          [trade.baseAsset, trade.baseAssetPrecision]
+          , [trade.quoteAsset, trade.quoteAssetPrecision]
+        ] as [string, number][]
+        ).map(([asset, precision]) => (
+          <View key={asset} style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
+            <View><CryptoAssetImage asset={asset} /></View>
+            <Text style={{ marginLeft: 10 }}>{asset}: {(u.wallet[asset] ?? 0).toFixed(precision)}</Text>
+          </View>
+        ))}
+      </View>
+    ))
+    .orElse(null);
 }
 
 function Price(props: {
@@ -134,13 +158,16 @@ function ChartBase(props: {
       webViewRef.current?.injectJavaScript(`(function(){if(gotPrice) gotPrice(${newPrice})})()`);
     })
   }, [props.symbol]);
+  const CHART_HEIGHT = 300;
 
   if(!res.data) {
-    return <ActivityIndicator />
+    return <View style={{ height: CHART_HEIGHT, alignItems: "center", justifyContent: "center" }}>
+      <ActivityIndicator />
+    </View>
   }
   return <WebView
     ref={webViewRef}
-    style={{ width: "100%", height: 300, }}
+    style={{ width: "100%", height: CHART_HEIGHT, }}
     source={{
       html: `
     <html>

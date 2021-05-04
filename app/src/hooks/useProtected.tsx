@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from "@react-navigation/core";
 import firebase from "firebase"
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export function useProtected() {
   const nav = useNavigation<NavigationProp<RootStackParams>>();

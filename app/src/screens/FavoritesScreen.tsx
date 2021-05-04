@@ -3,8 +3,9 @@ import React, { useMemo } from 'react'
 import { View } from 'react-native'
 import Header from "../components/Header"
 import { useAuth } from "../context/AuthContext"
+import { use24HrTicker } from "../hooks/use24HrTicker"
 import { maybe } from "../util/Maybe"
-import { Pairs, use24HrTicker } from "./TrendingScreen"
+import { Pairs } from "./TrendingScreen"
 
 export default function FavoritesScreen(props: StackScreenProps<RootStackParams, "Tabs">) {
   const authCtx = useAuth();

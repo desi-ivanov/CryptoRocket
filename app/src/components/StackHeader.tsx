@@ -23,7 +23,7 @@ export default function StackHeader(props: {
           )}
         </View>
         <View style={{ flex: 5, justifyContent: "center", alignItems: "center" }}>
-          <Text style={{ textAlignVertical: "center", textAlign: "center", fontWeight: "600", fontSize: 27, marginBottom: 10 }}>{props.title}</Text>
+          <Text style={{ textAlignVertical: "center", textAlign: "center", fontWeight: "600", fontSize: 27 }}>{props.title}</Text>
         </View>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           {props.right}
