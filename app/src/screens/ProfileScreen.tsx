@@ -5,15 +5,17 @@ import Button from "../components/Button"
 import Header from "../components/Header"
 import Colors from "../constants/Colors"
 import { useAuth } from "../context/AuthContext"
+import { useLoading } from "../context/LoadingContext"
 
 export default function ProfileScreen(props: StackScreenProps<RootStackParams, "Tabs">) {
   const auth = useAuth();
+  const loading = useLoading();
   function handleSignupPressed() {
     props.navigation.navigate("Signup");
   }
 
   function handleLogoutPressed() {
-    auth.logout();
+    loading(() => auth.logout());
   }
 
   return (
