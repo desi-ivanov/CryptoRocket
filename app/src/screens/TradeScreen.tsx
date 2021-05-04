@@ -92,12 +92,12 @@ function TradeBase(props: {
                   flex: 1
                   , borderWidth: 1
                   , borderRadius: 5
-                  , borderColor: Colors.lightgray2
+                  , borderColor: Colors.gray
                   , alignItems: "center"
-                  , backgroundColor: selectedPerc.isPresentAnd(y => y >= x) ? Colors.lightgray2 : undefined
+                  , backgroundColor: selectedPerc.isPresentAnd(y => y >= x) ? Colors.gray : Colors.lightgray
                   , paddingVertical: 5
                 }}>
-                <Text>{(x * 100).toFixed(0)}%</Text>
+                <Text style={{fontWeight: "500", color: "#000"}}>{(x * 100).toFixed(0)}%</Text>
               </View>
             </TouchableOpacity>
           ))

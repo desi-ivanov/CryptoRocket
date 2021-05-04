@@ -25,7 +25,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "dev.desislav.cryptorocket"
     },
     "web": {
       "favicon": "./assets/favicon.png"
