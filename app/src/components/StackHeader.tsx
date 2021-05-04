@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/core"
 import { StackScreenProps } from "@react-navigation/stack"
 import { NavigationProp } from "@react-navigation/native"
+import Colors from "../constants/Colors"
 
 export default function StackHeader(props: {
   title: string
@@ -14,7 +15,7 @@ export default function StackHeader(props: {
 
   return (
     <SafeAreaView>
-      <View style={{ flexDirection: "row", paddingHorizontal: 20, alignItems: "center" }}>
+      <View style={{ flexDirection: "row", paddingHorizontal: 20, alignItems: "center", borderBottomWidth: 1, borderColor: Colors.lightgray }}>
         <View style={{ flex: 1 }}>
           {props.left ?? (
             <TouchableOpacity onPress={() => nav.goBack()}>

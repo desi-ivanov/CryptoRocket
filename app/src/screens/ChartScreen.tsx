@@ -14,6 +14,7 @@ import { AlertError } from "../util/util"
 import { useLoading } from "../context/LoadingContext"
 import { useExchangeInfo } from "../hooks/useExchangeInfo"
 import { CryptoAssetImage } from "./TrendingScreen"
+import Colors from "../constants/Colors"
 
 
 export default function ChartScreen(props: StackScreenProps<RootStackParams, "Chart">) {
@@ -65,7 +66,7 @@ export default function ChartScreen(props: StackScreenProps<RootStackParams, "Ch
         <Holdings symbol={props.route.params.symbol} />
       </ScrollView>
       <SafeAreaView>
-        <View style={{ paddingHorizontal: 20, flexDirection: "row", marginBottom: 10 }}>
+        <View style={{ paddingHorizontal: 20, flexDirection: "row", paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.lightgray }}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
           </View>
