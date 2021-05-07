@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import "./src/firebaseInit"
-import React, { ReactChild } from "react";
+import React, { ReactChild, useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -17,9 +17,13 @@ import LoginScreen from "./src/screens/LoginScreen";
 import PasswordResetScreen from "./src/screens/PasswordResetScreen";
 import { LoadingContextProvider } from "./src/context/LoadingContext";
 import { AuthProvider } from "./src/context/AuthContext";
-import { StatusBar } from "react-native";
+import { StatusBar, Text, View } from "react-native";
 import TradeScreen from "./src/screens/TradeScreen";
 import AlertScreen from "./src/screens/AlertScreen";
+import * as Updates from "expo-updates";
+import LottieView from 'lottie-react-native';
+import Assets from "./src/constants/Assets";
+import { Dimensions } from "react-native";
 
 const TabsNavigator = createBottomTabNavigator<{
   Trending: undefined
@@ -47,6 +51,35 @@ function Tabs() {
 }
 
 export default function App() {
+  const [hasUpdates, setHasUpdates] = useState(false);
+  const [checkedForUpdates, setCheckedForUpdates] = useState(false);
+
+  useEffect(() => {
+    Updates.checkForUpdateAsync()
+      .then((res) => {
+        if(res.isAvailable) {
+          setHasUpdates(true);
+          return Updates.fetchUpdateAsync()
+            .then(() => Updates.reloadAsync())
+            .catch(() => setHasUpdates(false));
+        } else {
+          setHasUpdates(false);
+        }
+      }).catch(() => {
+        setHasUpdates(false);
+      })
+      .finally(() => setCheckedForUpdates(true))
+  }, []);
+
+  if(hasUpdates || !checkedForUpdates) {
+    const { width, height } = Dimensions.get("screen");
+    const Size = Math.min(width * 0.8, height * 0.8);
+    return <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+      <LottieView speed={2} autoPlay style={{ width: Size, height: Size, }} source={Assets.lottieMining} />
+      <Text>Downloading updates...</Text>
+    </View>;
+  }
+
   return (
     <LoadingContextProvider>
       <AuthProvider>
