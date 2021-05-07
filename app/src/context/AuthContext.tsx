@@ -4,7 +4,7 @@ import { Nothing, Maybe, Just } from "../util/Maybe";
 import Binance from "./Binance";
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
-import {Platform } from "react-native";
+import { Platform } from "react-native";
 
 const INITIAL_BALANCE = 1000000;
 
@@ -29,6 +29,20 @@ interface AuthProviderProps { }
 const UserCollection = firebase.firestore().collection("users") as firebase.firestore.CollectionReference<User>;
 const TransactionsCollection = (uid: string) => UserCollection.doc(uid).collection("transactions") as firebase.firestore.CollectionReference<Transaction>;
 const AlertsCollection = (uid: string) => UserCollection.doc(uid).collection("alerts") as firebase.firestore.CollectionReference<PriceAlert>;
+
+const addAlertBase: (curAuth: firebase.User) => AuthContextType["addAlert"] = (curAuth) => async (symbol, percentage) => {
+  const tick = await Binance.instance.ticker(symbol);
+  const priceTop = parseFloat(tick.price) * (1 + percentage);
+  const priceBottom = parseFloat(tick.price) * (1 - percentage);
+  await AlertsCollection(curAuth.uid)
+    .add({
+      percentage
+      , symbol
+      , priceTop
+      , priceBottom
+      , uid: curAuth.uid
+    });
+}
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [auth, setAuth] = useState<Maybe<firebase.User>>(Nothing());
@@ -66,6 +80,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
   }, [])
 
+
+  const addAlert: AuthContextType["addAlert"] = async (symbol, percentage) => addAlertBase(auth.getOrThrow())(symbol, percentage)
+
   return (
     <AuthContext.Provider
       value={{
@@ -86,6 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
           const newUser: User = { name, wallet: { USDT: INITIAL_BALANCE }, email, favoritePairs: [], notificationTokens: [] };
           await UserCollection.doc(res.user.uid).set(newUser);
+          await addAlertBase(res.user)("BTCUSDT", 0.01);
           setAuth(Just(res.user));
           setUser(Just(newUser));
           return res.user;
@@ -133,20 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               .add({ fromAsset, toAsset, quantity, price: realPrice })
           ]);
         }
-        , addAlert: async (symbol, percentage) => {
-          const curAuth = auth.getOrThrow();
-          const tick = await Binance.instance.ticker(symbol);
-          const priceTop = parseFloat(tick.price) * (1 + percentage);
-          const priceBottom = parseFloat(tick.price) * (1 - percentage);
-          await AlertsCollection(curAuth.uid)
-            .add({
-              percentage
-              , symbol
-              , priceTop
-              , priceBottom
-              , uid: curAuth.uid
-            });
-        }
+        , addAlert
         , removeAlert: async (id) => {
           const curAuth = auth.getOrThrow();
           await AlertsCollection(curAuth.uid)
