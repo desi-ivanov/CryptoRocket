@@ -59,15 +59,12 @@ export default function App() {
       .then((res) => {
         if(res.isAvailable) {
           setHasUpdates(true);
-          return Updates.fetchUpdateAsync()
-            .then(() => Updates.reloadAsync())
-            .catch(() => setHasUpdates(false));
+          return Updates.fetchUpdateAsync().then(() => Updates.reloadAsync())
         } else {
           setHasUpdates(false);
+          return Promise.resolve();
         }
-      }).catch(() => {
-        setHasUpdates(false);
-      })
+      }).catch(() => setHasUpdates(false))
       .finally(() => setCheckedForUpdates(true))
   }, []);
 
