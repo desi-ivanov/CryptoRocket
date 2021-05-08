@@ -80,30 +80,38 @@ function Navigator() {
   </NavigationContainer>
 }
 
-export default function App() {
-  const [hasUpdates, setHasUpdates] = useState(false);
-  const [checkedForUpdates, setCheckedForUpdates] = useState(false);
+type UpdatesStatus = "loading" | "will_reload" | "no_updates";
+function useUpdates(): { status: UpdatesStatus } {
+  const [updatesStatus, setUpdatesStatus] = useState<UpdatesStatus>("loading");
 
   useEffect(() => {
     Updates.checkForUpdateAsync()
       .then((res) => {
         if(res.isAvailable) {
-          setHasUpdates(true);
+          setUpdatesStatus("will_reload");
           return Updates.fetchUpdateAsync().then(() => Updates.reloadAsync())
         } else {
-          setHasUpdates(false);
+          setUpdatesStatus("no_updates");
           return Promise.resolve();
         }
-      }).catch(() => setHasUpdates(false))
-      .finally(() => setCheckedForUpdates(true))
+      }).catch(() => setUpdatesStatus("no_updates"))
   }, []);
 
-  if(hasUpdates || !checkedForUpdates) {
-    const { width, height } = Dimensions.get("screen");
-    const Size = Math.min(width * 0.8, height * 0.8);
+  return { status: updatesStatus };
+}
+
+const { width, height } = Dimensions.get("screen");
+const Size = Math.min(width * 0.8, height * 0.8);
+export default function App() {
+  const updates = useUpdates();
+
+  if(updates.status === "loading" || updates.status === "will_reload") {
     return <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
       <LottieView speed={2} autoPlay style={{ width: Size, height: Size, }} source={Assets.lottieMining} />
-      <Text>Downloading updates...</Text>
+      <Text>{updates.status === "loading"
+        ? "Checking for updates..."
+        : "Downloading updates..."}
+      </Text>
     </View>;
   }
 
