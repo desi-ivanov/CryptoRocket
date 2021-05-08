@@ -20,6 +20,32 @@ class Queuer {
     this.queue = [];
   }
 }
+
+type BinanceTickerMessage = {
+  "A": string
+  "B": string
+  "C": number
+  "E": number
+  "F": number
+  "L": number
+  "O": number
+  "P": string
+  "Q": string
+  "a": string
+  "b": string
+  "c": string
+  "e": string
+  "h": string
+  "l": string
+  "n": number,
+  "o": string
+  "p": string
+  "q": string
+  "s": string
+  "v": string
+  "w": string
+  "x": string
+}
 class Binance {
   private ws: WebSocket | null;
   private priceSubs: Map<string, ({ id: number, f: (price: number) => void })[]>;
@@ -46,18 +72,21 @@ class Binance {
   private async subscribe(product_id: string) {
     this.lock.run(async () => {
       try {
-        this.ws?.send(JSON.stringify({
-          "method": "SUBSCRIBE",
-          "params": [`${product_id.toLowerCase()}@ticker`],
-          "id": Date.now()
-        }));
+        if(this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws?.send(JSON.stringify({
+            "method": "SUBSCRIBE",
+            "params": [`${product_id.toLowerCase()}@ticker`],
+            "id": Date.now()
+          }));
+        } else {
+          setTimeout(() => this.subscribe(product_id), 1000); // retry
+        }
       } catch(err) {
         console.error("Error while subscribing on binance for " + product_id, err);
       }
       await new Promise(r => setTimeout(r, 2000)); // inance rate limiting
     });
   }
-
 
   private connect() {
     const that = this;
@@ -66,31 +95,7 @@ class Binance {
     that.ws.onopen = () => {
       console.log("Connection with binance enstablished successfully");
       that.ws!.onmessage = ({ data }) => {
-        const parsed: {
-          "A": string
-          "B": string
-          "C": number
-          "E": number
-          "F": number
-          "L": number
-          "O": number
-          "P": string
-          "Q": string
-          "a": string
-          "b": string
-          "c": string
-          "e": string
-          "h": string
-          "l": string
-          "n": number,
-          "o": string
-          "p": string
-          "q": string
-          "s": string
-          "v": string
-          "w": string
-          "x": string
-        } = JSON.parse(data.toString());
+        const parsed: BinanceTickerMessage = JSON.parse(data.toString());
         if("s" in parsed) {
           that.priceSubs.get(parsed.s)?.forEach(s => s.f(parseFloat(parsed.c)));
         }
@@ -112,22 +117,6 @@ class Binance {
   }> {
     return get(`/ticker/price?symbol=${product_id.toUpperCase()}`)
       .then(res => res.ok ? res.json() : Promise.reject(res.text()));
-  }
-  public candles(opts: {
-    product_id: string
-    interval: "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "6h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M"
-  }): Promise<{ time: number, low: number, high: number, open: number, close: number, volume: number }[]> {
-    return get(`/klines?symbol=${opts.product_id.toUpperCase()}&interval=${opts.interval}`)
-      .then(res => res.json())
-      .then(data => data.map(([time, open, high, low, close, volume]: [number, ...string[]]) => ({
-        time: time
-        , low: parseFloat(low)
-        , high: parseFloat(high)
-        , open: parseFloat(open)
-        , close: parseFloat(close)
-        , volume: parseFloat(volume)
-      }))
-      );
   }
 }
 
