@@ -2,7 +2,7 @@
   "expo": {
     "name": "Crypto Rocket",
     "slug": "crypto-rocket",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -26,7 +26,8 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "dev.desislav.cryptorocket"
+      "package": "dev.desislav.cryptorocket",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,8 +1,8 @@
 import "react-native-gesture-handler";
 import "./src/firebaseInit"
-import React, { ReactChild, useEffect, useState } from "react";
+import React, { ReactChild, useEffect, useRef, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, NavigationContainerRef } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "./src/constants/Colors";
 import TrendingScreen from "./src/screens/TrendingScreen";
@@ -24,6 +24,7 @@ import * as Updates from "expo-updates";
 import LottieView from 'lottie-react-native';
 import Assets from "./src/constants/Assets";
 import { Dimensions } from "react-native";
+import * as Notifications from "expo-notifications";
 
 const TabsNavigator = createBottomTabNavigator<{
   Trending: undefined
@@ -48,6 +49,35 @@ function Tabs() {
       <TabsNavigator.Screen name="Profile" options={{ tabBarIcon: TabBarIcon("user") }} component={ProfileScreen} />
     </TabsNavigator.Navigator>
   );
+}
+
+function Navigator() {
+  const navigatorRef = useRef<NavigationContainerRef>(null);
+  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+
+  React.useEffect(() => {
+    if(
+      lastNotificationResponse
+      && lastNotificationResponse.notification.request.content.data
+      && lastNotificationResponse.notification.request.content.data.type === "chart"
+      && lastNotificationResponse.notification.request.content.data.symbol
+      && lastNotificationResponse.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER
+    ) {
+      navigatorRef.current?.navigate("Chart", { symbol: lastNotificationResponse.notification.request.content.data.symbol } as RootStackParams["Chart"]);
+    }
+  }, [lastNotificationResponse]);
+
+  return <NavigationContainer ref={navigatorRef}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Tabs" component={Tabs} />
+      <Stack.Screen name="Chart" component={ChartScreen} />
+      <Stack.Screen name="Trade" component={TradeScreen} />
+      <Stack.Screen name="Alert" component={AlertScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="PasswordReset" component={PasswordResetScreen} />
+    </Stack.Navigator>
+  </NavigationContainer>
 }
 
 export default function App() {
@@ -81,17 +111,7 @@ export default function App() {
     <LoadingContextProvider>
       <AuthProvider>
         <StatusBar barStyle="dark-content" />
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Tabs" component={Tabs} />
-            <Stack.Screen name="Chart" component={ChartScreen} />
-            <Stack.Screen name="Trade" component={TradeScreen} />
-            <Stack.Screen name="Alert" component={AlertScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="PasswordReset" component={PasswordResetScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <Navigator />
       </AuthProvider>
     </LoadingContextProvider>
   );
