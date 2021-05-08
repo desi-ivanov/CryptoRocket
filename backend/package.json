@@ -4,7 +4,8 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "build": "tsc"
   },
   "dependencies": {
     "@types/ws": "^7.4.1",
