@@ -56,8 +56,6 @@ function Navigator() {
   const lastNotificationResponse = Notifications.useLastNotificationResponse();
 
   React.useEffect(() => {
-    navigatorRef.current?.navigate("Chart", { symbol: "ETHUSDT" } as RootStackParams["Chart"]);
-
     if(
       lastNotificationResponse
       && lastNotificationResponse.notification.request.content.data
