@@ -59,7 +59,7 @@ export default function AlertsScreen(props: StackScreenProps<RootStackParams, "T
                     onLongPress={() => handleAlertLongPressed(item)}
                     style={{ flexDirection: "row", alignItems: "center" }}
                   >
-                    <CryptoAssetImage asset={exInfo.map[item.data.symbol].baseAsset ?? ""} />
+                    <CryptoAssetImage asset={exInfo.map[item.data.symbol]?.baseAsset} />
                     <View style={{ flex: 1, paddingLeft: 10 }}><Text style={{ fontWeight: "600" }}>{item.data.symbol}</Text></View>
                     <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
                       <Text style={{ fontWeight: "600" }}>{(item.data.percentage * 100).toFixed(2)}%</Text>

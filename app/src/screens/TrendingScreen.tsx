@@ -65,11 +65,11 @@ export function Pairs(props: {
 }
 
 export function CryptoAssetImage(props: {
-  asset: string
+  asset?: string
 }) {
   return <View style={{ width: 56, height: 56, borderRadius: 20, backgroundColor: "#faeffa", alignItems: "center", justifyContent: "center" }}>
     <Image
-      source={{ uri: CryptoAssetImageUri(props.asset.toLowerCase()) }}
+      source={{ uri: CryptoAssetImageUri(props.asset?.toLowerCase() ?? "") }}
       style={{ width: 32, height: 32 }}
     />
   </View>

@@ -56,6 +56,8 @@ function Navigator() {
   const lastNotificationResponse = Notifications.useLastNotificationResponse();
 
   React.useEffect(() => {
+    navigatorRef.current?.navigate("Chart", { symbol: "ETHUSDT" } as RootStackParams["Chart"]);
+
     if(
       lastNotificationResponse
       && lastNotificationResponse.notification.request.content.data
@@ -89,7 +91,7 @@ function useUpdates(): { status: UpdatesStatus } {
       .then((res) => {
         if(res.isAvailable) {
           setUpdatesStatus("will_reload");
-          return Updates.fetchUpdateAsync().then(() => Updates.reloadAsync())
+          return Updates.fetchUpdateAsync().then(() => Updates.reloadAsync().catch(console.error))
         } else {
           setUpdatesStatus("no_updates");
           return Promise.resolve();

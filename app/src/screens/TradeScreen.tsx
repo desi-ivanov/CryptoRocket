@@ -48,12 +48,15 @@ function TradeBase(props: {
   const loading = useLoading();
   const ctx = useAuth();
 
-  useEffect(() => {
-    return Binance.instance.subscribePrice(props.symbol, setPrice);
-  }, [props.symbol])
+  useEffect(() => Binance.instance.subscribePrice(props.symbol, setPrice), [props.symbol])
+  const tradeInfo = exInfo.map[props.symbol];
 
-  const actionAsset = exInfo.map[props.symbol]?.[props.type === "buy" ? "quoteAsset" : "baseAsset"];
-  const takeAsset = exInfo.map[props.symbol]?.[props.type === "buy" ? "baseAsset" : "quoteAsset"];
+  if(!tradeInfo) {
+    return <></>;
+  }
+
+  const actionAsset = tradeInfo[props.type === "buy" ? "quoteAsset" : "baseAsset"];
+  const takeAsset = tradeInfo[props.type === "buy" ? "baseAsset" : "quoteAsset"];
   const qtynum = parseFloat(qty.replace(/,/g, ".")) || 0;
   const takeQty = (qtynum) * (props.type === "sell" ? price : (1 / price));
   const availability = props.user.wallet[actionAsset] ?? 0;
@@ -97,7 +100,7 @@ function TradeBase(props: {
                   , backgroundColor: selectedPerc.isPresentAnd(y => y >= x) ? Colors.gray : Colors.lightgray
                   , paddingVertical: 5
                 }}>
-                <Text style={{fontWeight: "500", color: "#000"}}>{(x * 100).toFixed(0)}%</Text>
+                <Text style={{ fontWeight: "500", color: "#000" }}>{(x * 100).toFixed(0)}%</Text>
               </View>
             </TouchableOpacity>
           ))

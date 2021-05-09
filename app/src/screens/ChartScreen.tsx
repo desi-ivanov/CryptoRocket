@@ -15,6 +15,7 @@ import { useLoading } from "../context/LoadingContext"
 import { useExchangeInfo } from "../hooks/useExchangeInfo"
 import { CryptoAssetImage } from "./TrendingScreen"
 import Colors from "../constants/Colors"
+import { maybe } from "../util/Maybe"
 
 
 export default function ChartScreen(props: StackScreenProps<RootStackParams, "Chart">) {
@@ -87,14 +88,18 @@ function Holdings(props: {
 }) {
   const ctx = useAuth();
   const exInfo = useExchangeInfo();
-  const trade = exInfo.map[props.symbol];
+  const tradeInfo = exInfo.map[props.symbol];
+
+  if(!tradeInfo) {
+    return null;
+  }
   return ctx.user
-    .map(u => (
+    .map((u) => (
       <View>
         <Text style={{ fontSize: 20, fontWeight: "500" }}>Available</Text>
         {([
-          [trade.baseAsset, trade.baseAssetPrecision]
-          , [trade.quoteAsset, trade.quoteAssetPrecision]
+          [tradeInfo.baseAsset, tradeInfo.baseAssetPrecision]
+          , [tradeInfo.quoteAsset, tradeInfo.quoteAssetPrecision]
         ] as [string, number][]
         ).map(([asset, precision]) => (
           <View key={asset} style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
