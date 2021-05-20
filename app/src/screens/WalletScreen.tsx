@@ -72,7 +72,7 @@ function Holdings(props: {
     refreshControl={<RefreshControl refreshing={ticker24hr.isValidating} onRefresh={ticker24hr.revalidate} />}
     style={{ flex: 1 }}
     contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 10 }}
-    data={Object.entries(props.user.wallet)}
+    data={Object.entries(props.user.wallet).filter(x => x[1] > 0.0001)}
     ItemSeparatorComponent={() => <View style={{ borderTopWidth: 1, marginVertical: 10, borderColor: Colors.lightgray }} />}
     renderItem={({ item: [asset, quantity] }) => (
       <View style={{ flexDirection: "row", alignItems: "center" }}>
