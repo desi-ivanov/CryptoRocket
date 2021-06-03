@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
   },
   "dependencies": {
     "@react-native-community/masked-view": "0.1.10",
@@ -20,6 +21,7 @@
     "lottie-react-native": "3.5.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-hooks-testing-library": "^0.6.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
     "react-native-chart-kit": "^6.11.0",
     "react-native-gesture-handler": "~1.10.2",
@@ -31,10 +33,26 @@
     "react-native-webview": "11.2.3",
     "swr": "^0.5.5"
   },
+  "jest": {
+    "preset": "jest-expo",
+    "automock": false,
+    "setupFiles": [
+      "./setupJest.js"
+    ]
+  },
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@testing-library/react-native": "^7.2.0",
+    "@types/jest": "^26.0.23",
     "@types/react": "~16.9.35",
     "@types/react-native": "~0.63.2",
+    "@types/react-test-renderer": "^17.0.1",
+    "cross-fetch": "^3.1.4",
+    "jest-expo": "^41.0.0",
+    "jest-fetch-mock": "^3.0.3",
+    "jest-websocket-mock": "^2.2.0",
+    "mock-socket": "^9.0.3",
+    "react-test-renderer": "^17.0.2",
     "typescript": "~4.0.0"
   },
   "private": true
