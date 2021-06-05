@@ -15,7 +15,7 @@ export default function StackHeader(props: {
 
   return (
     <SafeAreaView>
-      <View style={{ flexDirection: "row", paddingHorizontal: 20, alignItems: "center", borderBottomWidth: 1, borderColor: Colors.lightgray }}>
+      <View style={{ flexDirection: "row", paddingHorizontal: 20, paddingVertical: 10, alignItems: "center", borderBottomWidth: 1, borderColor: Colors.lightgray }}>
         <View style={{ flex: 1 }}>
           {props.left ?? (
             <TouchableOpacity onPress={() => nav.goBack()}>

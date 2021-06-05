@@ -1,6 +1,6 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { View, Text, Alert, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import React, { createContext, ReactChild, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Feather, AntDesign } from "@expo/vector-icons"
 import Binance from "../context/Binance"
@@ -15,16 +15,43 @@ import { useLoading } from "../context/LoadingContext"
 import { useExchangeInfo } from "../hooks/useExchangeInfo"
 import { CryptoAssetImage } from "./TrendingScreen"
 import Colors from "../constants/Colors"
-import { maybe } from "../util/Maybe"
+type Granularity = "1m" | "15m" | "1h" | "4h" | "1d"
+type KlinesContextType = {
+  candles: [number, number, number, number, number, number][]
+  granularity: Granularity
+  symbol: string
+  loading: boolean
+  setGranularity: (g: Granularity) => void
+  refresh: () => void
+}
+const KlinesContext = createContext<KlinesContextType>({
+  candles: []
+  , granularity: "1m"
+  , symbol: ""
+  , setGranularity: () => { }
+  , loading: false
+  , refresh: () => { }
+});
 
+function KlinesContextProvider(props: { symbol: string, children: ReactChild }) {
+  const [granularity, setGranularity] = useState<Granularity>("1m");
+  // [time, open, high, low, close, volume]
+  const res = useSWR<[number, number, number, number, number, number][]>(`https://api.binance.com/api/v3/klines?symbol=${props.symbol}&interval=${granularity}`);
+
+  return <KlinesContext.Provider
+    value={{ granularity, setGranularity, candles: res.data ?? [], loading: res.isValidating, refresh: res.revalidate, symbol: props.symbol }}
+  >
+    {props.children}
+  </KlinesContext.Provider>
+}
 
 export default function ChartScreen(props: StackScreenProps<RootStackParams, "Chart">) {
   const protect = useProtected();
   const ctx = useAuth();
-  const loading = useLoading();
+  const loader = useLoading();
   function handleStar() {
     protect(() => {
-      loading(() => ctx.addOrRemoveFavourite(props.route.params.symbol).catch(AlertError));
+      loader(() => ctx.addOrRemoveFavourite(props.route.params.symbol).catch(AlertError));
     });
   }
   function handleAlertPressed() {
@@ -48,38 +75,45 @@ export default function ChartScreen(props: StackScreenProps<RootStackParams, "Ch
 
 
   return (
-    <View style={{ backgroundColor: "#fff", flex: 1 }}>
-      <StackHeader
-        title={props.route.params.symbol}
-        right={(
-          <TouchableOpacity onPress={handleStar}>
-            <AntDesign
-              name={isFavourite ? "star" : "staro"}
-              style={{ fontSize: 35, color: isFavourite ? "#F0B90B" : "black" }}
-            />
-          </TouchableOpacity>
-        )}
-      />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
-        <Text style={{ fontSize: 20, fontWeight: "500" }}>Price</Text>
-        <Price symbol={props.route.params.symbol} />
-        <Chart symbol={props.route.params.symbol} />
-        <Holdings symbol={props.route.params.symbol} />
-      </ScrollView>
-      <SafeAreaView>
-        <View style={{ paddingHorizontal: 20, flexDirection: "row", paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.lightgray }}>
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
+    <KlinesContextProvider symbol={props.route.params.symbol}>
+      <View style={{ backgroundColor: "#fff", flex: 1 }}>
+        <StackHeader
+          title={props.route.params.symbol}
+          right={(
+            <TouchableOpacity onPress={handleStar}>
+              <AntDesign
+                name={isFavourite ? "star" : "staro"}
+                style={{ fontSize: 35, color: isFavourite ? "#F0B90B" : "black" }}
+              />
+            </TouchableOpacity>
+          )}
+        />
+        <KlinesContext.Consumer>
+          {({ loading, refresh }) => (
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }} refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}>
+              <Text style={{ fontSize: 20, fontWeight: "500" }}>Price</Text>
+              <Price symbol={props.route.params.symbol} />
+              <Chart symbol={props.route.params.symbol} />
+              <Holdings symbol={props.route.params.symbol} />
+            </ScrollView>
+
+          )}
+        </KlinesContext.Consumer>
+        <SafeAreaView>
+          <View style={{ paddingHorizontal: 20, flexDirection: "row", paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.lightgray }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
+            </View>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <Button textStyle={{ fontSize: 13 }} onPress={handleBuyPressed} style={{ paddingHorizontal: 30 }}>BUY</Button>
+            </View>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <Button textStyle={{ fontSize: 13 }} onPress={handleSellPressed} style={{ paddingHorizontal: 30 }}>SELL</Button>
+            </View>
           </View>
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <Button textStyle={{ fontSize: 13 }} onPress={handleBuyPressed} style={{ paddingHorizontal: 30 }}>BUY</Button>
-          </View>
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <Button textStyle={{ fontSize: 13 }} onPress={handleSellPressed} style={{ paddingHorizontal: 30 }}>SELL</Button>
-          </View>
-        </View>
-      </SafeAreaView>
-    </View>
+        </SafeAreaView>
+      </View>
+    </KlinesContextProvider>
   )
 }
 
@@ -128,13 +162,12 @@ function Price(props: {
   )
 }
 
-type Granularity = "1m" | "15m" | "1h" | "4h" | "1d"
 const Granularities: Granularity[] = ["1m", "15m", "1h", "4h", "1d"];
 
 function Chart(props: {
   symbol: string
 }) {
-  const [granularity, setGranularity] = useState<Granularity>("1m");
+  const { granularity, setGranularity } = useContext(KlinesContext);
 
   return <View>
     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -143,7 +176,7 @@ function Chart(props: {
         style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 10 }}
         onPress={() => setGranularity(gran)}
       >
-        <Text style={[gran === granularity && { fontWeight: "600" }]}>{gran}</Text>
+        <Text style={[gran === granularity && { fontWeight: "700" }]}>{gran}</Text>
       </TouchableOpacity>
       )}
     </View>
@@ -156,8 +189,7 @@ function ChartBase(props: {
   granularity: Granularity
 }) {
   const webViewRef = useRef<WebView | null>(null);
-  // [time, open, high, low, close, volume]
-  const res = useSWR<[number, number, number, number, number, number][]>(`https://api.binance.com/api/v3/klines?symbol=${props.symbol}&interval=${props.granularity}`);
+  const { candles } = useContext(KlinesContext);
 
   useEffect(() => {
     return Binance.instance.subscribePrice(props.symbol, newPrice => {
@@ -166,11 +198,7 @@ function ChartBase(props: {
   }, [props.symbol]);
   const CHART_HEIGHT = 300;
 
-  if(!res.data) {
-    return <View style={{ height: CHART_HEIGHT, alignItems: "center", justifyContent: "center" }}>
-      <ActivityIndicator />
-    </View>
-  }
+
   return <WebView
     ref={webViewRef}
     style={{ width: "100%", height: CHART_HEIGHT, }}
@@ -212,11 +240,11 @@ function ChartBase(props: {
         wickDownColor: 'red',
         wickUpColor: '#68BA42',
         priceFormat: {
-          precision: ${res.data.slice(-1)[0][4] > 100 ? 2 : 4},
-          minMove: ${res.data.slice(-1)[0][4] > 100 ? 0.01 : 0.0001}
+          precision: ${(candles.slice(-1)?.[0]?.[4] ?? 0) > 100 ? 2 : 4},
+          minMove: ${(candles.slice(-1)?.[0]?.[4] ?? 0) > 100 ? 0.01 : 0.0001}
         },
       });
-      var data = JSON.parse(\`${JSON.stringify(res.data.map(([time, open, high, low, close]) => ({ time: time / 1000, open, high, low, close })))}\`);
+      var data = JSON.parse(\`${JSON.stringify(candles.map(([time, open, high, low, close]) => ({ time: time / 1000, open, high, low, close })))}\`);
       candleSeries.setData(data);
 
       function gotPrice(price) {

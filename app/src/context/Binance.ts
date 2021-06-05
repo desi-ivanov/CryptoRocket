@@ -1,10 +1,9 @@
-// JEST mocks
-const _ws = require("ws");
-const _fetch = require("cross-fetch");
-if(process.env.JEST_WORKER_ID) {
-  WebSocket = _ws;
-  fetch = _fetch;
-}
+// JEST mocks, uncomment for tests
+
+// if(process.env.JEST_WORKER_ID) {
+  // WebSocket = require("ws");
+  // fetch = require("cross-fetch");
+// }
 
 class Queuer {
   private queue: (() => Promise<void>)[] = [];

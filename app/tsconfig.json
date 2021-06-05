@@ -1,6 +1,7 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "jsx": "react",
     "strict": true,
     "downlevelIteration": true,
     "lib": ["ES2020", "ESNext", "ES2020.Promise"]
