@@ -10,7 +10,7 @@ import FavoritesScreen from "./src/screens/FavoritesScreen";
 import WalletScreen from "./src/screens/WalletScreen";
 import AlertsScreen from "./src/screens/AlertsScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
-import { createStackNavigator } from "@react-navigation/stack";
+import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack";
 import ChartScreen from "./src/screens/ChartScreen";
 import SignupScreen from "./src/screens/SignupScreen";
 import LoginScreen from "./src/screens/LoginScreen";
@@ -68,7 +68,7 @@ function Navigator() {
   }, [lastNotificationResponse]);
 
   return <NavigationContainer ref={navigatorRef}>
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}>
       <Stack.Screen name="Tabs" component={Tabs} />
       <Stack.Screen name="Chart" component={ChartScreen} />
       <Stack.Screen name="Trade" component={TradeScreen} />
