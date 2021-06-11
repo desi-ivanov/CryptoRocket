@@ -12,7 +12,7 @@ export type AuthContextType = {
   logout: () => Promise<void>
   addOrRemoveFavourite: (pair: string) => Promise<void>
   trade: (fromAsset: string, toAsset: string, quantity: number) => Promise<void>
-  addAlert: (symbol: string, percentage: number) => Promise<void>
+  addAlert: (symbol: string, percentage: number) => Promise<unknown>
   removeAlert: (id: string) => Promise<void>
 }
 export const AuthContext = React.createContext<AuthContextType>(null as any);
