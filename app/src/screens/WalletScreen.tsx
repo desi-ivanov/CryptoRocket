@@ -1,6 +1,6 @@
-import { StackScreenProps } from "@react-navigation/stack";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import React from 'react'
-import { FlatList, RefreshControl } from "react-native";
+import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
 import { View, Text, Image, Dimensions } from 'react-native'
 import Button from "../components/Button";
 import Header from "../components/Header"
@@ -29,7 +29,7 @@ export default function WalletScreen(props: StackScreenProps<RootStackParams, "T
         {authCtx.user
           .mapLazy(usr => (
             <View style={{ flex: 1 }}>
-              <Holdings user={usr} />
+              <Holdings user={usr} nvaigation={props.navigation} />
             </View>
           )
             , () => <Button style={{ marginHorizontal: 20 }} onPress={handleSugnupPressed}>Signup</Button>)}
@@ -41,6 +41,7 @@ export default function WalletScreen(props: StackScreenProps<RootStackParams, "T
 
 function Holdings(props: {
   user: User
+  nvaigation: StackNavigationProp<RootStackParams, "Tabs">
 }) {
   const ticker24hr = use24HrTicker();
 
@@ -52,6 +53,15 @@ function Holdings(props: {
         : asset === "USDT" ? quantity
           : 0)
       , 0);
+
+  function handleAssetPressed(asset: string) {
+    if((asset + "USDT") in ticker24hr.map) {
+      props.nvaigation.navigate("Chart", { symbol: asset + "USDT" });
+    } else if(asset === "USDT") {
+      props.nvaigation.navigate("Chart", { symbol: "BTCUSDT" });
+    }
+  }
+
   return <FlatList
     ListHeaderComponent={
       <View style={{
@@ -76,7 +86,10 @@ function Holdings(props: {
     data={Object.entries(props.user.wallet).filter(x => x[1] > 0.0001)}
     ItemSeparatorComponent={() => <View style={{ borderTopWidth: 1, marginVertical: 10, borderColor: Colors.lightgray }} />}
     renderItem={({ item: [asset, quantity] }) => (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={() => handleAssetPressed(asset)}
+        style={{ flexDirection: "row", alignItems: "center" }}
+      >
         <CryptoAssetImage asset={asset} />
         <View style={{ flex: 1, paddingLeft: 10 }}><Text style={{ fontWeight: "600" }}>{asset}</Text></View>
         <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
@@ -85,7 +98,7 @@ function Holdings(props: {
             && <Text style={{ color: Colors.lightgray2 }}>${(parseFloat(ticker24hr.map[asset + "USDT"].lastPrice) * quantity).toFixed(2)}</Text>
           }
         </View>
-      </View>
+      </TouchableOpacity>
 
     )}
     keyExtractor={([asset]) => asset}

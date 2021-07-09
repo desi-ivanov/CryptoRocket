@@ -99,7 +99,7 @@ export default function ChartScreen(props: StackScreenProps<RootStackParams, "Ch
 
           )}
         </KlinesContext.Consumer>
-        <SafeAreaView>
+        <SafeAreaView edges={["bottom"]}>
           <View style={{ paddingHorizontal: 20, flexDirection: "row", paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.lightgray }}>
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               <TouchableOpacity onPress={handleAlertPressed}><Feather name="bell" style={{ fontSize: 30 }} /></TouchableOpacity>
