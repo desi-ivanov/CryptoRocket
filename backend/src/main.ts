@@ -38,8 +38,11 @@ async function userNotificationToken(uid: string) {
 async function Subscribe(data: PriceAlert, docRef: FirebaseFirestore.DocumentReference<PriceAlert>): Promise<void> {
   unsubsMap[docRef.id] = binance.subscribePrice(data.symbol, async (currentPrice) => {
     try {
-      if(currentPrice < data.priceBottom
-        || currentPrice > data.priceTop
+      if(data.percentage >= 0.005
+        && (
+          currentPrice < data.priceBottom
+          || currentPrice > data.priceTop
+        )
       ) {
         console.log("Notifying", currentPrice, data)
 
