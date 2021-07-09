@@ -73,10 +73,12 @@ function Holdings(props: {
         , alignSelf: "center"
       }}>
         <Image source={Assets.Card} style={{ position: "absolute", height: "100%", width: "100%" }} resizeMode="cover" />
-        <View style={{ padding: 28 }}>
+        <View style={{ paddingLeft: 28, paddingTop: 28 }}>
           <Text style={{ color: "#fff", fontWeight: "700", fontSize: 32 }}>$ {fullBalance.toFixed(2)}</Text>
           <Text style={{ color: "#fff", marginTop: 5, fontSize: 15 }}>≈ {(fullBalance / (parseFloat(ticker24hr.map["BTCUSDT"]?.lastPrice ?? (fullBalance)))).toFixed(4)} ₿</Text>
-          <Text style={{ color: "#fff", marginTop: 5, fontSize: 15 }}>Your balance</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: "flex-end", paddingLeft: 28, paddingBottom: 28 }}>
+          <Text style={{ color: "#fff", marginTop: 20, fontSize: 10 }}>This balance is not real.</Text>
         </View>
       </View>
     }

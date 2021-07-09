@@ -48,7 +48,7 @@ function TradeBase(props: {
   const loading = useLoading();
   const ctx = useAuth();
 
-  useEffect(() => Binance.instance.subscribePrice(props.symbol, setPrice), [props.symbol])
+  useEffect(() => Binance.instance().subscribePrice(props.symbol, setPrice), [props.symbol])
   const tradeInfo = exInfo.map[props.symbol];
 
   if(!tradeInfo) {

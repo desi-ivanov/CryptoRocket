@@ -131,9 +131,16 @@ function get(endpoint: string) {
   return fetch(`https://api.binance.com/api/v3${endpoint}`, { method: "GET" });
 }
 
+let instance: Binance | null = null;
+function getInstance(): Binance {
+  if(instance === null) {
+    instance = new Binance();
+  }
+  return instance;
+}
 
 export default {
-  instance: new Binance()
+  instance: getInstance
 };
 
 

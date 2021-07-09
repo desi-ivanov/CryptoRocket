@@ -27,7 +27,7 @@ const PromsieAny: <T>(x: Promise<T>[]) => Promise<T> = x => new Promise((res, re
 });
 
 export async function trade(curAuth: firebase.User, curUser: User, fromAsset: string, toAsset: string, quantity: number) {
-  const tick = await PromsieAny([Binance.instance.ticker(fromAsset + toAsset), Binance.instance.ticker(toAsset + fromAsset)]);
+  const tick = await PromsieAny([Binance.instance().ticker(fromAsset + toAsset), Binance.instance().ticker(toAsset + fromAsset)]);
   const realPrice = tick.symbol.startsWith(fromAsset) ? parseFloat(tick.price) : (1 / parseFloat(tick.price));
   const destinationQuantity = quantity * realPrice;
   if(curUser.wallet[fromAsset] < quantity) {
@@ -65,7 +65,7 @@ export async function logout(auth: firebase.User) {
 
 export function addAlert(curAuth: firebase.User) {
   return async (symbol: string, percentage: number) => {
-    const tick = await Binance.instance.ticker(symbol);
+    const tick = await Binance.instance().ticker(symbol);
     const priceTop = parseFloat(tick.price) * (1 + percentage);
     const priceBottom = parseFloat(tick.price) * (1 - percentage);
     return AlertsCollection(curAuth.uid)

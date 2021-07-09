@@ -1,6 +1,6 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import React, { createContext, ReactChild, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Feather, AntDesign } from "@expo/vector-icons"
 import Binance from "../context/Binance"
@@ -90,11 +90,16 @@ export default function ChartScreen(props: StackScreenProps<RootStackParams, "Ch
         />
         <KlinesContext.Consumer>
           {({ loading, refresh }) => (
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }} refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}>
-              <Text style={{ fontSize: 20, fontWeight: "500" }}>Price</Text>
-              <Price symbol={props.route.params.symbol} />
+            <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}>
+              <View style={{ paddingHorizontal: 20 }}>
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Price</Text>
+                <Price symbol={props.route.params.symbol} />
+
+              </View>
               <Chart symbol={props.route.params.symbol} />
-              <Holdings symbol={props.route.params.symbol} />
+              <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+                <Holdings symbol={props.route.params.symbol} />
+              </View>
             </ScrollView>
 
           )}
@@ -152,7 +157,7 @@ function Price(props: {
   const [{ price, prevPrice }, setPrice] = useState({ price: 0, prevPrice: 0 });
 
   useEffect(() => {
-    return Binance.instance.subscribePrice(props.symbol, newPrice => {
+    return Binance.instance().subscribePrice(props.symbol, newPrice => {
       setPrice(cur => ({ prevPrice: cur.price, price: newPrice }))
     });
   }, [props.symbol]);
@@ -192,7 +197,7 @@ function ChartBase(props: {
   const { candles } = useContext(KlinesContext);
 
   useEffect(() => {
-    return Binance.instance.subscribePrice(props.symbol, newPrice => {
+    return Binance.instance().subscribePrice(props.symbol, newPrice => {
       webViewRef.current?.injectJavaScript(`(function(){if(gotPrice) gotPrice(${newPrice})})()`);
     })
   }, [props.symbol]);
@@ -201,7 +206,7 @@ function ChartBase(props: {
 
   return <WebView
     ref={webViewRef}
-    style={{ width: "100%", height: CHART_HEIGHT, }}
+    style={{ width: "100%", height: CHART_HEIGHT, borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.lightgray }}
     source={{
       html: `
     <html>
@@ -229,7 +234,11 @@ function ChartBase(props: {
         },
         timeScale: {
           timeVisible: true,
+          borderColor: "${Colors.lightgray}",
           fitContent: true
+        },
+        rightPriceScale: {
+          borderColor: "${Colors.lightgray}"
         },
       });
       var candleSeries = chart.addCandlestickSeries({
