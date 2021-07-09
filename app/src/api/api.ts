@@ -87,15 +87,26 @@ export async function login(email: string, password: string) {
   return res.user;
 }
 
+export async function signInAnonymously(): Promise<{ auth: firebase.User, user: User }> {
+  const rnd = Math.floor(Math.random() * 1000 + 1000) +Date.now();
+  const auth = await firebase.auth().signInAnonymously();
+  if(!auth.user) {
+    return Promise.reject("error while creating user");
+  }
+  return finalizeSignup("Anonymous", rnd+"@crypto-rocket.web.app", auth.user);
+}
 export async function signup(name: string, email: string, password: string): Promise<{ auth: firebase.User, user: User }> {
   const auth = await firebase.auth().createUserWithEmailAndPassword(email, password);
   if(!auth.user) {
     return Promise.reject("error while creating user");
   }
+  return finalizeSignup(name, email, auth.user);
+}
+async function finalizeSignup(name: string, email: string, authUser: firebase.User) {
   const user: User = { name, wallet: { USDT: INITIAL_BALANCE }, email, favoritePairs: [], notificationTokens: [] };
-  await UserCollection.doc(auth.user.uid).set(user);
-  await addAlert(auth.user)("BTCUSDT", 0.01);
-  return { auth: auth.user, user };
+  await UserCollection.doc(authUser.uid).set(user);
+  await addAlert(authUser)("BTCUSDT", 0.01);
+  return { auth: authUser, user };
 }
 
 export function addUserNotificationToken(user: firebase.User) {

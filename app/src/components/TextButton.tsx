@@ -4,7 +4,7 @@ import Colors from "../constants/Colors"
 
 export default function TextButton(props: {
   children: string
-  style: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
   onPress: () => void
 }) {
   return (

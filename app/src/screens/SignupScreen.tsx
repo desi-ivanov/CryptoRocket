@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from 'react'
 import { StackScreenProps } from "@react-navigation/stack"
-import { View, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+import { View, ScrollView, KeyboardAvoidingView, Platform, Text, Alert } from 'react-native'
 import Button from "../components/Button"
 import Input from "../components/Input"
 import StackHeader from "../components/StackHeader"
@@ -28,10 +28,27 @@ export default function SignupScreen(props: StackScreenProps<RootStackParams, "L
         props.navigation.goBack()
       }).catch(AlertError)
   }
+  function handleSkip() {
+    Alert.alert(
+      "Attention",
+      "Are you sure you want to log in anonymously?",
+      [
+        { text: "Cancel", style: "cancel" }
+        , {
+          text: "Sign in anonymously", style: "default", onPress: () => {
+            loading(() => auth.signInAnonimously())
+              .then(() => {
+                props.navigation.goBack()
+              }).catch(AlertError);
+          }
+        }
+      ]
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StackHeader title="Signup" />
+      <StackHeader title="Signup" right={<TextButton onPress={handleSkip}>Skip</TextButton>} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.select({ ios: "padding" })}>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ paddingHorizontal: 20 }}>

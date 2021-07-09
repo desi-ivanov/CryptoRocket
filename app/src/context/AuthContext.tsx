@@ -7,6 +7,7 @@ export type AuthContextType = {
   auth: Maybe<firebase.User>
   user: Maybe<User>
   alerts: { id: string, data: PriceAlert }[]
+  signInAnonimously: () => Promise<firebase.User>
   login: (email: string, password: string) => Promise<firebase.User>
   signup: (name: string, email: string, password: string) => Promise<firebase.User>
   logout: () => Promise<void>
@@ -67,6 +68,12 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
           await api.logout(auth.getOrThrow());
           setUser(Nothing());
           setAuth(Nothing());
+        }
+        , signInAnonimously: async () => {
+          const res = await api.signInAnonymously();
+          setAuth(Just(res.auth));
+          setUser(Just(res.user));
+          return res.auth;
         }
         , addOrRemoveFavourite: (symbol) => api.addOrRemoveFavourite(auth.getOrThrow(), user.getOrThrow(), symbol)
         , trade: (fromAsset, toAsset, quantity) => api.trade(auth.getOrThrow(), user.getOrThrow(), fromAsset, toAsset, quantity)
