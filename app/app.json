@@ -2,7 +2,7 @@
   "expo": {
     "name": "Crypto Rocket",
     "slug": "crypto-rocket",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.desislav.crypto-rocket",
-      "buildNumber": "2"
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +28,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "dev.desislav.cryptorocket",
-      "versionCode": 7
+      "versionCode": 8
     },
     "web": {
       "favicon": "./assets/favicon.png"
