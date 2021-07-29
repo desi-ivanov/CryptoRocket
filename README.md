@@ -11,3 +11,7 @@ Try it out here:
 ## Notifications for BTCUSDT 1% alert
 
 ![](screenshots/notifications.jpg)
+
+## Demo
+
+![](screenshots/demo.gif)
