@@ -6,6 +6,7 @@ declare type RootStackParams = {
   Signup: undefined
   Login: undefined
   PasswordReset: undefined
+  PickSymbolScreen: { onFinish: (symbol: string) => void }
 }
 
 declare type PriceTicker = {

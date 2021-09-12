@@ -6,7 +6,7 @@ import { NavigationContainer, NavigationContainerRef } from "@react-navigation/n
 import { Feather } from "@expo/vector-icons";
 import Colors from "./src/constants/Colors";
 import TrendingScreen from "./src/screens/TrendingScreen";
-import FavoritesScreen from "./src/screens/FavoritesScreen";
+import PositionsScreen from "./src/screens/PositionsScreen";
 import WalletScreen from "./src/screens/WalletScreen";
 import AlertsScreen from "./src/screens/AlertsScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
@@ -25,10 +25,11 @@ import LottieView from 'lottie-react-native';
 import Assets from "./src/constants/Assets";
 import { Dimensions } from "react-native";
 import * as Notifications from "expo-notifications";
+import PickSymbolScreen from "./src/screens/PickSymbolScreen";
 
 const TabsNavigator = createBottomTabNavigator<{
   Trending: undefined
-  Favorites: undefined
+  Positions: undefined
   Wallet: undefined
   Alerts: undefined
   Profile: undefined
@@ -43,9 +44,8 @@ function Tabs() {
   return (
     <TabsNavigator.Navigator tabBarOptions={{ showLabel: false }}    >
       <TabsNavigator.Screen name="Trending" options={{ tabBarIcon: TabBarIcon("bar-chart-2") }} component={TrendingScreen} />
-      <TabsNavigator.Screen name="Favorites" options={{ tabBarIcon: TabBarIcon("star") }} component={FavoritesScreen} />
       <TabsNavigator.Screen name="Wallet" options={{ tabBarIcon: TabBarIcon("credit-card") }} component={WalletScreen} />
-      <TabsNavigator.Screen name="Alerts" options={{ tabBarIcon: TabBarIcon("clock") }} component={AlertsScreen} />
+      <TabsNavigator.Screen name="Alerts" options={{ tabBarIcon: TabBarIcon("bell") }} component={AlertsScreen} />
       <TabsNavigator.Screen name="Profile" options={{ tabBarIcon: TabBarIcon("user") }} component={ProfileScreen} />
     </TabsNavigator.Navigator>
   );
@@ -76,6 +76,7 @@ function Navigator() {
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="PasswordReset" component={PasswordResetScreen} />
+      <Stack.Screen name="PickSymbolScreen" component={PickSymbolScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 }

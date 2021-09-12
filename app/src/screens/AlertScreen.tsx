@@ -40,8 +40,8 @@ export default function AlertScreen(props: StackScreenProps<RootStackParams, "Al
             textInputProps={{ keyboardType: "numeric", defaultValue: "1.00", value: percentage }}
             style={{ flex: 1 }}
           />
-          <TouchableOpacity onPress={() => setPercentage(p => (parseFloat(p) + 0.5).toFixed(2))} style={{ padding: 15, alignItems: "center", justifyContent: "center" }}><Feather size={20} color={Colors.gray} name="plus" /></TouchableOpacity>
           <TouchableOpacity onPress={() => parseFloat(percentage) - 0.5 > 0 && setPercentage(p => (parseFloat(p) - 0.5).toFixed(2))} style={{ padding: 15, alignItems: "center", justifyContent: "center" }}><Feather size={20} color={Colors.gray} name="minus" /></TouchableOpacity>
+          <TouchableOpacity onPress={() => setPercentage(p => (parseFloat(p) + 0.5).toFixed(2))} style={{ padding: 15, alignItems: "center", justifyContent: "center" }}><Feather size={20} color={Colors.gray} name="plus" /></TouchableOpacity>
         </View>
         <View style={{ flexDirection: "row", marginTop: 20 }}>
           {

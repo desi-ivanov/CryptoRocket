@@ -1,3 +1,4 @@
+import Feather from "@expo/vector-icons/build/Feather";
 import { StackScreenProps } from "@react-navigation/stack";
 import React from 'react'
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, Alert } from 'react-native'
@@ -40,9 +41,18 @@ export default function AlertsScreen(props: StackScreenProps<RootStackParams, "T
       ]);
   }
 
+  const handlePlusPressed = React.useCallback(() => {
+    props.navigation.navigate("PickSymbolScreen", {
+      onFinish: (symbol) => props.navigation.navigate("Alert", { symbol })
+    });
+  }, [props.navigation])
+
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
-      <Header title="Alerts" />
+      <Header
+        title="Alerts"
+        right={authCtx.auth.isPresent() && <TouchableOpacity onPress={handlePlusPressed} style={{ alignItems: "center", justifyContent: "center", padding: 5 }}><Feather name="plus" style={{ fontSize: 25 }} /></TouchableOpacity>}
+      />
       <View style={{ marginTop: 20, flex: 1 }}>
         {authCtx.user
           .mapLazy(_ => (
