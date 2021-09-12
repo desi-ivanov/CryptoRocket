@@ -26,6 +26,7 @@ import { Dimensions } from "react-native";
 import * as Notifications from "expo-notifications";
 import PickSymbolScreen from "./src/screens/PickSymbolScreen";
 import { AskReview } from "./src/util/util";
+import * as Analytics from 'expo-firebase-analytics';
 
 const TabsNavigator = createBottomTabNavigator<{
   Trending: undefined
@@ -53,6 +54,7 @@ function Tabs() {
 
 function Navigator() {
   const navigatorRef = useRef<NavigationContainerRef>(null);
+  const routeNameRef = useRef<string | undefined>();
   const lastNotificationResponse = Notifications.useLastNotificationResponse();
 
   React.useEffect(() => {
@@ -68,7 +70,18 @@ function Navigator() {
     }
   }, [lastNotificationResponse]);
 
-  return <NavigationContainer ref={navigatorRef}>
+  return <NavigationContainer
+    ref={navigatorRef}
+    onReady={() => routeNameRef.current = navigatorRef.current?.getCurrentRoute()?.name}
+    onStateChange={() => {
+      const previousRouteName = routeNameRef.current;
+      const currentRouteName = navigatorRef?.current?.getCurrentRoute()?.name;
+      if(previousRouteName !== currentRouteName) {
+        Analytics.setCurrentScreen(currentRouteName!)
+      }
+      routeNameRef.current = currentRouteName;
+    }}
+  >
     <Stack.Navigator screenOptions={{ headerShown: false, cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}>
       <Stack.Screen name="Tabs" component={Tabs} />
       <Stack.Screen name="Chart" component={ChartScreen} />

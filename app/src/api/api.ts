@@ -3,6 +3,8 @@ import Binance from "../context/Binance";
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { Platform } from "react-native";
+import * as AppleAuthentication from 'expo-apple-authentication';
+
 const INITIAL_BALANCE = 1000000;
 
 export function addOrRemoveFavourite(a: firebase.User, u: User, symbol: string) {
@@ -87,13 +89,40 @@ export async function login(email: string, password: string) {
   return res.user;
 }
 
+export async function signInWithApple(): Promise<{ auth: firebase.User, user: User }> {
+  const nonce = Math.random().toString(36).substring(2, 10);
+  const appleCredential = await AppleAuthentication.signInAsync({
+    requestedScopes: [
+      AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+      AppleAuthentication.AppleAuthenticationScope.EMAIL,
+    ],
+  });
+  const { identityToken } = appleCredential;
+  const provider = new firebase.auth.OAuthProvider('apple.com');
+  const credential = provider.credential({
+    idToken: identityToken!,
+    rawNonce: nonce
+  });
+  const auth = await firebase.auth().signInWithCredential(credential);
+  if(!auth.user) {
+    return Promise.reject("error while creating user");
+  }
+  const rnd = Math.floor(Math.random() * 1000 + 1000) + Date.now();
+
+  return finalizeSignup(
+    appleCredential.fullName?.nickname ?? appleCredential.fullName?.givenName ?? "Anonymous"
+    , appleCredential.email ?? (rnd + "@crypto-rocket.web.app")
+    , auth.user
+  );
+}
+
 export async function signInAnonymously(): Promise<{ auth: firebase.User, user: User }> {
-  const rnd = Math.floor(Math.random() * 1000 + 1000) +Date.now();
+  const rnd = Math.floor(Math.random() * 1000 + 1000) + Date.now();
   const auth = await firebase.auth().signInAnonymously();
   if(!auth.user) {
     return Promise.reject("error while creating user");
   }
-  return finalizeSignup("Anonymous", rnd+"@crypto-rocket.web.app", auth.user);
+  return finalizeSignup("Anonymous", rnd + "@crypto-rocket.web.app", auth.user);
 }
 export async function signup(name: string, email: string, password: string): Promise<{ auth: firebase.User, user: User }> {
   const auth = await firebase.auth().createUserWithEmailAndPassword(email, password);

@@ -47,6 +47,7 @@ export function Pairs(props: {
           : x.symbol.includes(q.toUpperCase()))
         && (favOnly ? favs.has(x.symbol) : true)
       )
+      .slice(0, favOnly ? undefined : 30)
   }, [q, data, favOnly])
 
   return <>

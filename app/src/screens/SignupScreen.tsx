@@ -8,6 +8,7 @@ import TextButton from "../components/TextButton"
 import { useLoading } from "../context/LoadingContext"
 import { AuthContext } from "../context/AuthContext"
 import { AlertError } from "../util/util"
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 export default function SignupScreen(props: StackScreenProps<RootStackParams, "Login">) {
   const inputRef = useRef<{ name: string, email: string, password: string }>({
@@ -28,6 +29,14 @@ export default function SignupScreen(props: StackScreenProps<RootStackParams, "L
         props.navigation.goBack()
       }).catch(AlertError)
   }
+
+  async function handleSignInWithApple() {
+    auth.signInWithApple()
+      .then(() => {
+        props.navigation.goBack()
+      }).catch(AlertError)
+  }
+
   function handleSkip() {
     Alert.alert(
       "Attention",
@@ -56,10 +65,21 @@ export default function SignupScreen(props: StackScreenProps<RootStackParams, "L
             <Input placeholder="Email" style={{ marginTop: 20 }} onChangeText={handleEmailChanged} />
             <Input placeholder="Password" style={{ marginTop: 20 }} onChangeText={handlePasswordChanged} secureTextEntry />
             <Button onPress={handleCreatePressed} style={{ width: "100%", marginTop: 60 }}>Create account</Button>
+            {Platform.OS === "ios" && AppleAuthentication && <AppleButton onPress={handleSignInWithApple} />}
             <TextButton onPress={() => props.navigation.navigate("Login")} style={{ marginTop: 60 }}>Sign in</TextButton>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
   )
+}
+
+const AppleButton = ({ onPress }: { onPress: () => void }) => {
+  return <AppleAuthentication.AppleAuthenticationButton
+    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+    cornerRadius={16}
+    style={{ width: "100%", paddingVertical: 25, marginTop: 20 }}
+    onPress={onPress}
+  />
 }

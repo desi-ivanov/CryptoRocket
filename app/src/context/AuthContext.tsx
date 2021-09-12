@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import firebase from "firebase";
 import { Nothing, Maybe, Just } from "../util/Maybe";
 import * as api from "../api/api";
+import * as Analytics from 'expo-firebase-analytics';
 
 export type AuthContextType = {
   auth: Maybe<firebase.User>
   user: Maybe<User>
   alerts: { id: string, data: PriceAlert }[]
   signInAnonimously: () => Promise<firebase.User>
+  signInWithApple: () => Promise<firebase.User>
   login: (email: string, password: string) => Promise<firebase.User>
   signup: (name: string, email: string, password: string) => Promise<firebase.User>
   logout: () => Promise<void>
@@ -31,6 +33,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
       prevUserSub();
       prevAlertsSub();
       if(u) {
+        Analytics.setUserId(u.uid);
         setAuth(Just(u));
         api.addUserNotificationToken(u);
         prevUserSub = api.UserCollection
@@ -79,6 +82,12 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         , trade: (fromAsset, toAsset, quantity) => api.trade(auth.getOrThrow(), user.getOrThrow(), fromAsset, toAsset, quantity)
         , addAlert: (symbol, percentage) => api.addAlert(auth.getOrThrow())(symbol, percentage)
         , removeAlert: (id) => api.removeAlert(auth.getOrThrow(), id)
+        , signInWithApple: async () => {
+          const res = await api.signInWithApple();
+          setAuth(Just(res.auth));
+          setUser(Just(res.user));
+          return res.auth;
+        }
       }}
     >
       {children}
