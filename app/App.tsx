@@ -16,7 +16,7 @@ import LoginScreen from "./src/screens/LoginScreen";
 import PasswordResetScreen from "./src/screens/PasswordResetScreen";
 import { LoadingContextProvider } from "./src/context/LoadingContext";
 import { AuthProvider } from "./src/context/AuthContext";
-import { StatusBar, Text, View } from "react-native";
+import { ActivityIndicator, StatusBar, Text, View } from "react-native";
 import TradeScreen from "./src/screens/TradeScreen";
 import AlertScreen from "./src/screens/AlertScreen";
 import * as Updates from "expo-updates";
@@ -122,7 +122,7 @@ export default function App() {
 
   if(updates.status === "loading" || updates.status === "will_reload") {
     return <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-      <LottieView speed={2} autoPlay style={{ width: Size, height: Size, }} source={Assets.lottieMining} />
+      <ActivityIndicator size="large" color="orange" />
       <Text>{updates.status === "loading"
         ? "Checking for updates..."
         : "Downloading updates..."}
