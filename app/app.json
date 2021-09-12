@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.desislav.crypto-rocket",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "usesAppleSignIn": true,
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -30,7 +30,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "dev.desislav.cryptorocket",
-      "versionCode": 8
+      "versionCode": 9
     },
     "web": {
       "favicon": "./assets/favicon.png"
