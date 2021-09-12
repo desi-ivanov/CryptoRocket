@@ -10,7 +10,7 @@ import Binance from "../context/Binance"
 import { useLoading } from "../context/LoadingContext"
 import { useExchangeInfo } from "../hooks/useExchangeInfo"
 import { Just, Nothing } from "../util/Maybe"
-import { AlertError } from "../util/util"
+import { AlertError, AskReview } from "../util/util"
 
 export default function TradeScreen(props: StackScreenProps<RootStackParams, "Trade">) {
   const ctx = useAuth();
@@ -64,7 +64,8 @@ function TradeBase(props: {
   function handleSubmit() {
     loading(() => ctx.trade(actionAsset, takeAsset, selectedPerc.isPresentAnd(p => p === 1) ? availability : qtynum))
       .then(() => {
-        props.navigationProps.navigation.pop()
+        props.navigationProps.navigation.pop();
+        AskReview(1000);
       })
       .catch(AlertError);
   }

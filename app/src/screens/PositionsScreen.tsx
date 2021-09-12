@@ -13,7 +13,6 @@ type Position = {
 }
 
 export default function PositionsScreen(props: StackScreenProps<RootStackParams, "Tabs">) {
-  const ctx = useAuth();
 
   const positions: Position[] = [];
 

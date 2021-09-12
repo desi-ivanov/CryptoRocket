@@ -47,14 +47,13 @@ export function Pairs(props: {
           : x.symbol.includes(q.toUpperCase()))
         && (favOnly ? favs.has(x.symbol) : true)
       )
-      .slice(0, favOnly ? undefined : 20);
   }, [q, data, favOnly])
 
   return <>
     <View style={{ paddingHorizontal: 20 }}>
       <SearchBar onChange={setQ} />
       <TouchableOpacity onPress={toggleFavOnly} style={{ paddingVertical: 10, alignSelf: "flex-end" }}>
-        <Text style={{ color: favOnly ? "#F0B90B" : "lightgray", fontWeight: "bold" }}>Favourites only</Text>
+        <Text style={{ color: favOnly ? "#F0B90B" : "gray", fontWeight: "bold" }}>Favourites only</Text>
       </TouchableOpacity>
     </View>
     <FlatList

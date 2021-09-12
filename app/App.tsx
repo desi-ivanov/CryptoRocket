@@ -6,7 +6,6 @@ import { NavigationContainer, NavigationContainerRef } from "@react-navigation/n
 import { Feather } from "@expo/vector-icons";
 import Colors from "./src/constants/Colors";
 import TrendingScreen from "./src/screens/TrendingScreen";
-import PositionsScreen from "./src/screens/PositionsScreen";
 import WalletScreen from "./src/screens/WalletScreen";
 import AlertsScreen from "./src/screens/AlertsScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
@@ -26,6 +25,7 @@ import Assets from "./src/constants/Assets";
 import { Dimensions } from "react-native";
 import * as Notifications from "expo-notifications";
 import PickSymbolScreen from "./src/screens/PickSymbolScreen";
+import { AskReview } from "./src/util/util";
 
 const TabsNavigator = createBottomTabNavigator<{
   Trending: undefined
@@ -64,6 +64,7 @@ function Navigator() {
       && lastNotificationResponse.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER
     ) {
       navigatorRef.current?.navigate("Chart", { symbol: lastNotificationResponse.notification.request.content.data.symbol } as RootStackParams["Chart"]);
+      AskReview(10000);
     }
   }, [lastNotificationResponse]);
 

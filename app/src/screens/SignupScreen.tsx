@@ -56,8 +56,8 @@ export default function SignupScreen(props: StackScreenProps<RootStackParams, "L
             <Input placeholder="Email" style={{ marginTop: 20 }} onChangeText={handleEmailChanged} />
             <Input placeholder="Password" style={{ marginTop: 20 }} onChangeText={handlePasswordChanged} secureTextEntry />
             <Button onPress={handleCreatePressed} style={{ width: "100%", marginTop: 60 }}>Create account</Button>
+            <TextButton onPress={() => props.navigation.navigate("Login")} style={{ marginTop: 60 }}>Sign in</TextButton>
           </View>
-          <TextButton onPress={() => props.navigation.navigate("Login")} style={{ marginTop: 60 }}>Sign in</TextButton>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

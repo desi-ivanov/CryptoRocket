@@ -8,6 +8,7 @@ export default function PickSymbolScreen(props: StackScreenProps<RootStackParams
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
       <StackHeader title={"New alert"} />
+      <View style={{height: 20}}></View>
       <Pairs onItemPressed={t => props.route.params.onFinish(t.symbol)} />
     </View>
   )
