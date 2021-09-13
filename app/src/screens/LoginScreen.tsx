@@ -32,7 +32,7 @@ export default function LoginScreen(props: StackScreenProps<RootStackParams, "Lo
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.select({ ios: "padding" })}>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ paddingHorizontal: 20 }}>
-            <Input onChangeText={handleEmailChanged} placeholder="Email" style={{ marginTop: 80 }} />
+            <Input onChangeText={handleEmailChanged} textInputProps={{ keyboardType: "email-address" }} placeholder="Email" style={{ marginTop: 80 }} />
             <Input onChangeText={handlePasswordChanged} placeholder="Password" style={{ marginTop: 20 }} secureTextEntry />
             <Button onPress={handleLoginPressed} style={{ width: "100%", marginTop: 60 }}>Login</Button>
           </View>
