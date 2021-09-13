@@ -131,11 +131,16 @@ export async function signup(name: string, email: string, password: string): Pro
   }
   return finalizeSignup(name, email, auth.user);
 }
-async function finalizeSignup(name: string, email: string, authUser: firebase.User) {
-  const user: User = { name, wallet: { USDT: INITIAL_BALANCE }, email, favoritePairs: [], notificationTokens: [] };
-  await UserCollection.doc(authUser.uid).set(user);
-  await addAlert(authUser)("BTCUSDT", 0.01);
-  return { auth: authUser, user };
+async function finalizeSignup(name: string, email: string, authUser: firebase.User): Promise<{ auth: firebase.User, user: User }> {
+  const existingUser = await UserCollection.doc(authUser.uid).get();
+  if(existingUser.exists) {
+    return { auth: authUser, user: existingUser.data()! };
+  } else {
+    const newUser: User = { name, wallet: { USDT: INITIAL_BALANCE }, email, favoritePairs: [], notificationTokens: [] };
+    await UserCollection.doc(authUser.uid).set(newUser);
+    await addAlert(authUser)("BTCUSDT", 0.01);
+    return { auth: authUser, user: newUser };
+  }
 }
 
 export function addUserNotificationToken(user: firebase.User) {
