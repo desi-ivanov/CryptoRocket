@@ -10,7 +10,7 @@
   "dependencies": {
     "@types/ws": "^7.4.1",
     "expo-server-sdk": "^3.6.0",
-    "firebase-admin": "^9.6.0",
+    "firebase-admin": "^10.2.0",
     "ws": "^7.4.5"
   }
 }
