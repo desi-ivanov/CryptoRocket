@@ -1,7 +1,8 @@
 import admin from "firebase-admin";
-import { Expo } from 'expo-server-sdk';
+import { Expo, ExpoPushMessage } from 'expo-server-sdk';
 import { Binance } from "./Binance";
 import { Synchronized } from "./Synchronized.decorator";
+import { zip } from "./util";
 const serviceAccount = require("../service-account.json");
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
@@ -21,9 +22,10 @@ const UsersCollection = admin.firestore().collection("users") as admin.firestore
   notificationTokens: string[]
 }>;
 
-class NotificationTokenResolver {
-  memo: Record<string, Set<string>> = {};
-  isWatching = false
+class NotificationsManager {
+  private expo = new Expo();
+  private memo: Record<string, Set<string>> = {};
+  private isWatching = false
   constructor() {
 
     const memo: Record<string, string[]> = {};
@@ -38,7 +40,7 @@ class NotificationTokenResolver {
     }
   }
   @Synchronized()
-  async ensureWatching() {
+  private async ensureWatching() {
     if(this.isWatching) return;
     const initial = await UsersCollection.get();
     this.memo = Object.fromEntries(initial.docs.map(r => [r.id, new Set(r.data().notificationTokens)]));
@@ -56,18 +58,31 @@ class NotificationTokenResolver {
     this.isWatching = true;
   }
 
-  async get(uid: string): Promise<string[]> {
+  private async get(uid: string): Promise<string[]> {
     await this.ensureWatching();
     return [...(this.memo[uid] ?? new Set())];
+  }
+
+  async notify(uid: string, message: Omit<Partial<ExpoPushMessage>, "to">) {
+    const tokens = await this.get(uid);
+    const messages = tokens.map(t => ({ ...message, to: t }));
+    const tickets = await this.expo.sendPushNotificationsAsync(messages);
+    if(tickets.some(tick => tick.status === "error" && tick.details?.error === "DeviceNotRegistered")) {
+      const toRemove: string[] = zip(tickets, tokens)
+        .filter(([tick]) => tick.status === "error" && tick.details?.error === "DeviceNotRegistered")
+        .map(([, tok]) => tok);
+      await UsersCollection.doc(uid).update({
+        notificationTokens: admin.firestore.FieldValue.arrayRemove(...toRemove)
+      });
+    }
   }
 
 }
 
 export class Core {
-  expo = new Expo();
   binance = new Binance();
   unsubsMap: Record<string, () => void> = {};
-  ntfTokenResolver = new NotificationTokenResolver();
+  ntfManager = new NotificationsManager();
 
   async subscribeAlert(data: PriceAlert, docRef: FirebaseFirestore.DocumentReference<PriceAlert>): Promise<void> {
     this.unsubsMap[docRef.id] = this.binance.subscribePrice(data.symbol, async (currentPrice) => {
@@ -84,17 +99,11 @@ export class Core {
           data.priceTop = currentPrice * (1 + data.percentage);
           data.priceBottom = currentPrice * (1 - data.percentage);
           await docRef.update({ priceTop: data.priceTop, priceBottom: data.priceBottom });
-
-          const notifTokens = await this.ntfTokenResolver.get(data.uid);
-          if(notifTokens.length > 0) {
-            await this.expo.sendPushNotificationsAsync([{
-              to: notifTokens
-              , title: data.symbol
-              , body: `${currentPrice > prevPrice ? "🟢" : "🔵"} ${prevPrice.toFixed(2)} → ${currentPrice.toFixed(2)} ${currentPrice > prevPrice ? "📈" : "📉"} ${((currentPrice / prevPrice - 1) * 100).toFixed(2)}%`
-              , data: { type: "chart", symbol: data.symbol }
-            }]);
-            console.log("Sending", notifTokens)
-          }
+          await this.ntfManager.notify(data.uid, {
+            title: data.symbol
+            , body: `${currentPrice > prevPrice ? "🟢" : "🔵"} ${prevPrice.toFixed(2)} → ${currentPrice.toFixed(2)} ${currentPrice > prevPrice ? "📈" : "📉"} ${((currentPrice / prevPrice - 1) * 100).toFixed(2)}%`
+            , data: { type: "chart", symbol: data.symbol }
+          });
         }
       } catch(err) {
         console.log(err);
